@@ -113,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements WavRecorder.Recor
     private View.OnClickListener sendClickListener = new View.OnClickListener() {
         public void onClick(View v) {
             if (Utils.isOnline(getApplicationContext())) {
+                progressBar.setVisibility(View.VISIBLE);
                 uploadFile();
             } else {
                 Toast.makeText(MainActivity.this, "No internet Connection!", Toast.LENGTH_SHORT).show();
