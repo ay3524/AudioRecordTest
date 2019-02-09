@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements WavRecorder.Recor
     private Button stopButton;
     private Button recordStartButton;
     private Button recordStopButton;
-    private Button sendStopButton;
+    private Button sendButton;
     TextView textView;
 
     private ProgressBar progressBar;
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements WavRecorder.Recor
         recordStopButton = findViewById(R.id.record_stop_button);
         playButton = findViewById(R.id.play_button);
         stopButton = findViewById(R.id.stop_button);
-        sendStopButton = findViewById(R.id.send_button);
+        sendButton = findViewById(R.id.send_button);
         progressBar = findViewById(R.id.progress);
         textView = findViewById(R.id.text);
 
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements WavRecorder.Recor
 
         recordStartButton.setOnClickListener(recordStartClickListener);
         recordStopButton.setOnClickListener(recordStopClickListener);
-        sendStopButton.setOnClickListener(sendClickListener);
+        sendButton.setOnClickListener(sendClickListener);
 
         playButton.setOnClickListener(playClickListener);
         stopButton.setOnClickListener(stopClickListener);
@@ -189,6 +189,7 @@ public class MainActivity extends AppCompatActivity implements WavRecorder.Recor
         recordStartButton.setEnabled(false);
         playButton.setEnabled(false);
         stopButton.setEnabled(false);
+        sendButton.setEnabled(false);
     }
 
     @Override
@@ -198,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements WavRecorder.Recor
 
         recordStopButton.setEnabled(false);
         stopButton.setEnabled(false);
+        sendButton.setEnabled(true);
     }
 
     @Override
