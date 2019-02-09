@@ -13,6 +13,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
+import com.androidnetworking.interfaces.UploadProgressListener;
+
+import org.json.JSONObject;
 
 import java.io.File;
 
@@ -20,6 +29,8 @@ public class MainActivity extends AppCompatActivity implements WavRecorder.Recor
 
     private static final int RECORD_AUDIO_REQUEST_CODE = 100;
     private static final String TAG = MainActivity.class.getSimpleName();
+    //TODO change upload url
+    private static final String UPLOAD_URL = "";
     private static String audioPlayerName = null;
 
     private WavRecorder wavRecorder;
@@ -27,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements WavRecorder.Recor
     private Button stopButton;
     private Button recordStartButton;
     private Button recordStopButton;
+    private Button sendStopButton;
     TextView textView;
 
     private ProgressBar progressBar;
@@ -38,21 +50,23 @@ public class MainActivity extends AppCompatActivity implements WavRecorder.Recor
         setContentView(R.layout.activity_main);
 
         getPermissionToRecordAudio();
+        setUpViews();
+    }
 
-//        mediaPlayer = new MediaPlayer();
-//        mediaPlayer.setOnCompletionListener(completionListener);
-
+    private void setUpViews() {
         recordStartButton = findViewById(R.id.record_start_button);
         recordStopButton = findViewById(R.id.record_stop_button);
         playButton = findViewById(R.id.play_button);
         stopButton = findViewById(R.id.stop_button);
+        sendStopButton = findViewById(R.id.send_button);
         progressBar = findViewById(R.id.progress);
         textView = findViewById(R.id.text);
+
         createDirectoriesIfNeeded();
-//        setDataSource();
 
         recordStartButton.setOnClickListener(recordStartClickListener);
         recordStopButton.setOnClickListener(recordStopClickListener);
+        sendStopButton.setOnClickListener(sendClickListener);
 
         playButton.setOnClickListener(playClickListener);
         stopButton.setOnClickListener(stopClickListener);
@@ -93,6 +107,16 @@ public class MainActivity extends AppCompatActivity implements WavRecorder.Recor
 
             playButton.setEnabled(true);
             stopButton.setEnabled(false);
+        }
+    };
+
+    private View.OnClickListener sendClickListener = new View.OnClickListener() {
+        public void onClick(View v) {
+            if (Utils.isOnline(getApplicationContext())) {
+                uploadFile();
+            } else {
+                Toast.makeText(MainActivity.this, "No internet Connection!", Toast.LENGTH_SHORT).show();
+            }
         }
     };
 
@@ -186,5 +210,42 @@ public class MainActivity extends AppCompatActivity implements WavRecorder.Recor
     @Override
     public void onRecordError() {
 
+    }
+
+    public void uploadFile() {
+        File file = new File(audioPlayerName);
+
+        AndroidNetworking.upload(UPLOAD_URL)
+                //TODO if necessary, change the below according to back-end
+                .addMultipartFile("image", file)
+                //TODO change the below according to back-end
+                .addMultipartParameter("key", "value")
+                .setTag("uploadTest")
+                .setPriority(Priority.HIGH)
+                .build()
+                .setUploadProgressListener(new UploadProgressListener() {
+                    @Override
+                    public void onProgress(long bytesUploaded, long totalBytes) {
+                        // do anything with progress
+                        textView.setText("Bytes Uploaded : " + bytesUploaded);
+                        textView.append("\nTotal Bytes : " + totalBytes);
+                    }
+                })
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        progressBar.setVisibility(View.GONE);
+                        // do anything with response
+                        textView.setText(response.toString());
+                    }
+
+                    @Override
+                    public void onError(ANError error) {
+                        progressBar.setVisibility(View.GONE);
+                        // handle error
+                        textView.setText("Error While Uploading : ");
+                        textView.append("\n" + error.getErrorBody());
+                    }
+                });
     }
 }

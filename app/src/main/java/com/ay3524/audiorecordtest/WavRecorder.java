@@ -18,7 +18,6 @@ public class WavRecorder {
     private static final int RECORDER_SAMPLERATE = 16000;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
-    private short[] audioData;
 
     private AudioRecord recorder = null;
     private int bufferSize;
@@ -32,7 +31,7 @@ public class WavRecorder {
         bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
                 RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING) * 3;
 
-        audioData = new short[bufferSize];
+        short[] audioData = new short[bufferSize];
         output = path;
     }
 
